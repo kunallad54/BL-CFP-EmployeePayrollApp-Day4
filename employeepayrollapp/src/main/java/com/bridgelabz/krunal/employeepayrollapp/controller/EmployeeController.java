@@ -11,14 +11,19 @@
 package com.bridgelabz.krunal.employeepayrollapp.controller;
 
 import com.bridgelabz.krunal.employeepayrollapp.dto.EmployeeDTO;
+import com.bridgelabz.krunal.employeepayrollapp.dto.ResponseDTO;
 import com.bridgelabz.krunal.employeepayrollapp.entity.Employee;
 import com.bridgelabz.krunal.employeepayrollapp.service.EmployeeService;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class EmployeeController {
@@ -32,8 +37,10 @@ public class EmployeeController {
      * @return
      */
     @GetMapping(value = "/getEmployeeDetails")
-    public ResponseEntity<List<EmployeeDTO>> getEmployeeDetails(){
-        return new ResponseEntity<>(employeeService.getEmployeeDetails(), HttpStatus.OK);
+    public ResponseEntity<ResponseDTO> getEmployeeDetails() {
+        List<Employee> employeeDetails = employeeService.getEmployeeDetails();
+        ResponseDTO responseDTO = new ResponseDTO("Got all employee details", employeeDetails);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     /**
@@ -43,8 +50,19 @@ public class EmployeeController {
      * @return
      */
     @PostMapping(value = "/addEmployeeDetails")
-    public ResponseEntity<EmployeeDTO> addEmployeeDetails(@RequestBody EmployeeDTO employeeDTO){
-        return new ResponseEntity<>(employeeService.addEmployeeDetails(employeeDTO),HttpStatus.OK);
+    public ResponseEntity<ResponseDTO> addEmployeeDetails(@Valid @RequestBody EmployeeDTO employeeDTO,
+                                                          BindingResult er) {
+        if (er.hasErrors()) {
+            List<String> errors = er.getAllErrors().stream().map(objectError -> {
+                return objectError.getDefaultMessage();
+            }).collect(Collectors.toList());
+
+            return new ResponseEntity<>(new ResponseDTO("Validation Error", errors)
+                    , HttpStatus.BAD_REQUEST);
+        }
+        EmployeeDTO addEmployeeDetails = employeeService.addEmployeeDetails(employeeDTO);
+        ResponseDTO responseDTO = new ResponseDTO("Added new employee details", addEmployeeDetails);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     /**
@@ -54,21 +72,34 @@ public class EmployeeController {
      * @return
      */
     @GetMapping(value = "/getEmployeeDetailsByID")
-    public ResponseEntity<Employee> getEmployeeByID(@RequestParam(name = "id") int id) {
-        return new ResponseEntity<>(employeeService.getEmployeeDetailsByID(id), HttpStatus.OK);
+    public ResponseEntity<ResponseDTO> getEmployeeByID(@RequestParam(name = "id") int id) {
+        Employee employeeDetailsByID = employeeService.getEmployeeDetailsByID(id);
+        ResponseDTO responseDTO = new ResponseDTO("Got employee details by ID", employeeDetailsByID);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     /**
      * Purpose : Ability to update employee details in database using PUTMAPPING HTTP method
      *
      * @param id
-     * @param employee
+     * @param employeeDTO
      * @return
      */
     @PutMapping(value = "/updateEmployeeDetails")
-    public ResponseEntity<Employee> updateEmployeeDetails(@RequestParam(name = "id") int id,
-                                                   @RequestBody Employee employee) {
-        return new ResponseEntity<>(employeeService.updateEmployeeDetails(id, employee), HttpStatus.OK);
+    public ResponseEntity<ResponseDTO> updateEmployeeDetails(@Valid @RequestParam(name = "id") int id,
+                                                             @RequestBody EmployeeDTO employeeDTO,
+                                                             BindingResult er) {
+        if (er.hasErrors()) {
+            List<String> errors = er.getAllErrors().stream().map(objectError -> {
+                return objectError.getDefaultMessage();
+            }).collect(Collectors.toList());
+
+            return new ResponseEntity<>(new ResponseDTO("Validation Error", errors)
+                    , HttpStatus.BAD_REQUEST);
+        }
+        Employee updateEmployeeDetails = employeeService.updateEmployeeDetails(id, employeeDTO);
+        ResponseDTO responseDTO = new ResponseDTO("Updated Employee Details", updateEmployeeDetails);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     /**
@@ -78,7 +109,9 @@ public class EmployeeController {
      * @return
      */
     @DeleteMapping(value = "/deleteEmployeeDetails")
-    public ResponseEntity<String> deleteEmployeeDetails(@RequestParam(name = "id") int id) {
-        return new ResponseEntity<>(employeeService.deleteEmployeeDetails(id), HttpStatus.OK);
+    public ResponseEntity<ResponseDTO> deleteEmployeeDetails(@RequestParam(name = "id") int id) {
+        Employee deleteEmployeeDetails = employeeService.deleteEmployeeDetails(id);
+        ResponseDTO responseDTO = new ResponseDTO("Deleted the employee details", deleteEmployeeDetails);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 }

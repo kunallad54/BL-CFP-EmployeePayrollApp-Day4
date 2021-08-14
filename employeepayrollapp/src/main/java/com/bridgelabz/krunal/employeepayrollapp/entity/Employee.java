@@ -1,10 +1,13 @@
 package com.bridgelabz.krunal.employeepayrollapp.entity;
 
+import lombok.Data;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+@Data
 @Entity
 public class Employee {
 
@@ -17,51 +20,4 @@ public class Employee {
     private String empAddress;
     private double empSalary;
 
-    public int getEmpId() {
-        return empId;
-    }
-
-    public void setEmpId(int empId) {
-        this.empId = empId;
-    }
-
-    public String getEmpName() {
-        return empName;
-    }
-
-    public void setEmpName(String empName) {
-        this.empName = empName;
-    }
-
-    public String getEmpMobileNo() {
-        return empMobileNo;
-    }
-
-    public void setEmpMobileNo(String empMobileNo) {
-        this.empMobileNo = empMobileNo;
-    }
-
-    public String getEmpEmail() {
-        return empEmail;
-    }
-
-    public void setEmpEmail(String empEmail) {
-        this.empEmail = empEmail;
-    }
-
-    public String getEmpAddress() {
-        return empAddress;
-    }
-
-    public void setEmpAddress(String empAddress) {
-        this.empAddress = empAddress;
-    }
-
-    public double getEmpSalary() {
-        return empSalary;
-    }
-
-    public void setEmpSalary(double empSalary) {
-        this.empSalary = empSalary;
-    }
 }
